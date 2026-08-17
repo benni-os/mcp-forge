@@ -26,8 +26,8 @@ requires-python = ">=3.11"
 dependencies = ["pydantic>=2.13.4"]
 
 [project.optional-dependencies]
-http = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.1"]
-sse  = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.1"]
+http = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.3"]
+sse  = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.3"]
 cli  = ["typer>=0.27.0"]
 web  = ["httpx>=0.28.1"]
 dev  = [
@@ -35,7 +35,7 @@ dev  = [
     "pytest-asyncio>=1.4.0",
     "anyio[trio]>=4.14.2",
     "fastapi>=0.141.1",
-    "uvicorn[standard]>=0.52.1",
+    "uvicorn[standard]>=0.52.3",
     "typer>=0.27.0",
     "httpx>=0.28.1",
     "ruff>=0.16.1",
