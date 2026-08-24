@@ -1,13 +1,15 @@
-"""mcp-forge CLI — new, run, build, list."""
+"""mcp-forge CLI — new, run, validate, build, list."""
 
 import subprocess
 import sys
 from pathlib import Path
 
+from mcp_forge.cli.validator import validate_target
+
 try:
     import typer
-except ImportError:
-    raise SystemExit("mcp-forge CLI requires typer. Run: pip install mcp-forge[cli]")
+except ImportError as error:
+    raise SystemExit("mcp-forge CLI requires typer. Run: pip install mcp-forge[cli]") from error
 
 app = typer.Typer(
     name="mcp-forge",
@@ -26,7 +28,12 @@ def new(name: str = typer.Argument(..., help="Project name")) -> None:
 
     project_dir.mkdir()
     (project_dir / "server.py").write_text(
-        f'from mcp_forge import Forge\n\napp = Forge(name="{name}")\n\n\n@app.tool(description="Example tool")\ndef hello(name: str) -> str:\n    return f"Hello, {{name}}!"\n\n\nif __name__ == "__main__":\n    app.run()\n'
+        f'from mcp_forge import Forge\n\napp = Forge(name="{name}")\n\n\n'
+        '@app.tool(description="Example tool")\n'
+        "def hello(name: str) -> str:\n"
+        '    return f"Hello, {name}!"\n\n\n'
+        'if __name__ == "__main__":\n'
+        "    app.run()\n"
     )
     (project_dir / "mcp-forge.toml").write_text(
         f'[server]\nname = "{name}"\nversion = "0.1.0"\ntransport = "stdio"\n'
@@ -52,6 +59,29 @@ def run(
     if reload:
         cmd.append("--reload")
     subprocess.run(cmd, check=True)
+
+
+@app.command()
+def validate(
+    target: str = typer.Argument(..., help="Forge application target in module:attribute form"),
+) -> None:
+    """Validate registered tools without starting a transport."""
+    try:
+        report = validate_target(target)
+    except ValueError as error:
+        typer.echo(f"❌ {error}", err=True)
+        raise typer.Exit(1) from error
+
+    for message in report.errors:
+        typer.echo(f"❌ {message}", err=True)
+    for message in report.warnings:
+        typer.echo(f"⚠️  {message}")
+
+    if report.errors:
+        raise typer.Exit(1)
+
+    typer.echo(f"✅ tools: {report.tool_count} registered")
+    typer.echo("✅ schemas: all valid JSON Schema draft-07")
 
 
 @app.command(name="list")
