@@ -23,7 +23,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2.13.4"]
+dependencies = ["pydantic>=2.13.5"]
 
 [project.optional-dependencies]
 http = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.1"]
